@@ -1,179 +1,318 @@
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 /**
  * Portfolio data structure - customize with your own projects
+ * 
+ * Image recommendations:
+ * - thumbnail: 600×400px (3:2 aspect ratio) - shown in gallery
+ * - screenshot: 1200×800px (3:2 aspect ratio) - shown in modal
  */
 const portfolioData = [
     {
-        id: 'web-app',
-        title: 'Web Application',
-        category: 'Web',
-        description: 'Full-stack web application with modern UI',
-        images: ['/images/project1-1.jpg', '/images/project1-2.jpg'],
+        id: 'project-1',
+        title: 'Project One',
+        shortDescription: 'A brief overview of this amazing project',
+        extendedDescription: 'This is a detailed description of the project. It explains the technologies used, the challenges faced, and the solutions implemented. You can add multiple paragraphs here to fully describe your work, the impact it had, and what you learned from the experience.',
+        thumbnail: '/images/project1-thumb.jpg',
+        screenshot: '/images/project1-full.jpg',
     },
     {
-        id: 'design-system',
-        title: 'Design System',
-        category: 'Design',
-        description: 'Component library and design tokens',
-        images: ['/images/project2-1.jpg'],
+        id: 'project-2',
+        title: 'Project Two',
+        shortDescription: 'Another incredible project showcase',
+        extendedDescription: 'Detailed explanation of this second project. Include information about your role, the tech stack, key features, and any metrics or outcomes that demonstrate success. This is your opportunity to tell the full story behind your work.',
+        thumbnail: '/images/project2-thumb.jpg',
+        screenshot: '/images/project2-full.jpg',
     },
     {
-        id: 'mobile-app',
-        title: 'Mobile App',
-        category: 'Mobile',
-        description: 'Cross-platform mobile application',
-        images: ['/images/project3-1.jpg'],
-    },
-    {
-        id: 'api-project',
-        title: 'REST API',
-        category: 'Backend',
-        description: 'Scalable REST API architecture',
-        images: ['/images/project4-1.jpg'],
+        id: 'project-3',
+        title: 'Project Three',
+        shortDescription: 'Yet another standout project',
+        extendedDescription: 'A comprehensive description of project three. Highlight what makes this project special, any innovative approaches you took, and the value it provides. Use this space to really sell your skills and experience.',
+        thumbnail: '/images/project3-thumb.jpg',
+        screenshot: '/images/project3-full.jpg',
     },
 ];
 
 /**
- * Portfolio gallery with category filtering and responsive grid
+ * Hook to detect mobile viewport
+ */
+function useIsMobile(breakpoint = 768) {
+    const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < breakpoint);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [breakpoint]);
+
+    return isMobile;
+}
+
+/**
+ * Portfolio gallery with modal detail view
  */
 export function PortfolioGallery() {
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedProject, setSelectedProject] = useState(null);
+    const isMobile = useIsMobile();
 
-    const categories = ['All', ...new Set(portfolioData.map((p) => p.category))];
-
-    const filtered =
-        selectedCategory === 'All'
-            ? portfolioData
-            : portfolioData.filter((p) => p.category === selectedCategory);
+    // Close modal on escape key
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') setSelectedProject(null);
+        };
+        if (selectedProject) {
+            document.addEventListener('keydown', handleEscape);
+            return () => document.removeEventListener('keydown', handleEscape);
+        }
+    }, [selectedProject]);
 
     return (
         <div style={containerStyle}>
-            {/* Category Filter */}
-            <div style={filterContainerStyle}>
-                {categories.map((cat) => (
-                    <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        style={categoryButtonStyle(selectedCategory === cat)}
-                    >
-                        {cat}
-                    </button>
-                ))}
-            </div>
-
-            {/* Gallery Grid */}
+            {/* Project Cards */}
             <div style={gridStyle}>
-                {filtered.map((project) => (
-                    <div key={project.id} style={projectCardStyle}>
-                        <div style={imageContainerStyle}>
+                {portfolioData.map((project) => (
+                    <div
+                        key={project.id}
+                        style={projectCardStyle}
+                        onClick={() => setSelectedProject(project)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(project)}
+                    >
+                        <div style={thumbnailContainerStyle}>
                             <div style={placeholderImageStyle}>
                                 <span style={placeholderTextStyle}>{project.title}</span>
                             </div>
                         </div>
                         <div style={projectInfoStyle}>
                             <h3 style={projectTitleStyle}>{project.title}</h3>
-                            <p style={projectDescStyle}>{project.description}</p>
-                            <span style={categoryTagStyle}>{project.category}</span>
+                            <p style={projectDescStyle}>{project.shortDescription}</p>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Modal Overlay - Rendered via portal to bypass translateX */}
+            {selectedProject && createPortal(
+                <div style={modalOverlayStyle} onClick={() => setSelectedProject(null)}>
+                    <div style={modalContentStyle(isMobile)} onClick={(e) => e.stopPropagation()}>
+                        {/* Close Button */}
+                        <button
+                            style={closeButtonStyle}
+                            onClick={() => setSelectedProject(null)}
+                            aria-label="Close modal"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+
+                        {/* Modal Inner Layout - Responsive */}
+                        <div style={modalInnerStyle(isMobile)}>
+                            {/* Screenshot Section */}
+                            <div style={screenshotContainerStyle(isMobile)}>
+                                <div style={screenshotPlaceholderStyle}>
+                                    <span style={screenshotPlaceholderTextStyle}>
+                                        {selectedProject.title}
+                                        <br />
+                                        <small>1200×800px screenshot</small>
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Description Section */}
+                            <div style={descriptionContainerStyle(isMobile)}>
+                                <h2 style={modalTitleStyle}>{selectedProject.title}</h2>
+                                <p style={modalDescriptionStyle}>{selectedProject.extendedDescription}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 }
 
-// Styles
+// ============================================
+// Gallery Styles
+// ============================================
+
 const containerStyle = {
     padding: '20px',
     height: '100%',
     overflowY: 'auto',
 };
 
-const filterContainerStyle = {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '25px',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-};
-
-const categoryButtonStyle = (isActive) => ({
-    padding: '10px 20px',
-    backgroundColor: isActive ? '#FFD700' : 'rgba(255, 200, 50, 0.1)',
-    color: isActive ? '#000' : '#FFD700',
-    border: '1px solid #FFD700',
-    borderRadius: '20px',
-    cursor: 'pointer',
-    fontSize: '0.85em',
-    fontWeight: '500',
-    transition: 'all 0.2s ease',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-});
-
 const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '20px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '24px',
+    maxWidth: '1200px',
+    margin: '0 auto',
 };
 
 const projectCardStyle = {
     backgroundColor: 'rgba(255, 200, 50, 0.05)',
-    borderRadius: '12px',
+    borderRadius: '16px',
     overflow: 'hidden',
     border: '1px solid rgba(255, 200, 50, 0.2)',
     transition: 'all 0.3s ease',
     cursor: 'pointer',
 };
 
-const imageContainerStyle = {
+const thumbnailContainerStyle = {
     width: '100%',
-    height: '180px',
+    aspectRatio: '3 / 2',
     overflow: 'hidden',
 };
 
 const placeholderImageStyle = {
     width: '100%',
     height: '100%',
-    background: 'linear-gradient(135deg, rgba(255, 200, 50, 0.2) 0%, rgba(200, 150, 25, 0.3) 100%)',
+    background: 'linear-gradient(135deg, rgba(255, 200, 50, 0.15) 0%, rgba(180, 140, 30, 0.25) 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
 };
 
 const placeholderTextStyle = {
-    color: 'rgba(255, 200, 50, 0.6)',
-    fontSize: '1.1em',
+    color: 'rgba(255, 200, 50, 0.5)',
+    fontSize: '1.2em',
     fontWeight: '500',
 };
 
 const projectInfoStyle = {
-    padding: '16px',
+    padding: '20px',
     backdropFilter: 'blur(10px)',
     background: 'rgba(0, 0, 0, 0.6)',
 };
 
 const projectTitleStyle = {
-    fontSize: '1.1em',
+    fontSize: '1.3em',
     fontWeight: '600',
     marginBottom: '8px',
-    color: '#ffffff',
+    color: '#FFD700',
 };
 
 const projectDescStyle = {
-    fontSize: '0.85em',
+    fontSize: '0.95em',
     color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: '12px',
-    lineHeight: '1.4',
+    lineHeight: '1.5',
+    margin: 0,
 };
 
-const categoryTagStyle = {
-    display: 'inline-block',
-    padding: '4px 12px',
-    backgroundColor: 'rgba(255, 200, 50, 0.15)',
+// ============================================
+// Modal Styles (Responsive)
+// ============================================
+
+const modalOverlayStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backdropFilter: 'blur(8px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: '20px',
+    pointerEvents: 'auto',
+};
+
+const modalContentStyle = (isMobile) => ({
+    position: 'relative',
+    backgroundColor: 'rgba(20, 20, 20, 0.95)',
+    borderRadius: '20px',
+    border: '1px solid rgba(255, 200, 50, 0.3)',
+    maxWidth: isMobile ? '100%' : '1100px',
+    maxHeight: '90vh',
+    width: '100%',
+    overflow: 'hidden',
+    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+});
+
+const closeButtonStyle = {
+    position: 'absolute',
+    top: '16px',
+    right: '16px',
+    backgroundColor: 'rgba(255, 200, 50, 0.1)',
+    border: '1px solid rgba(255, 200, 50, 0.3)',
+    borderRadius: '50%',
+    width: '44px',
+    height: '44px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
     color: '#FFD700',
+    transition: 'all 0.2s ease',
+    zIndex: 10,
+    pointerEvents: 'auto',
+};
+
+const modalInnerStyle = (isMobile) => ({
+    display: 'flex',
+    flexDirection: isMobile ? 'column' : 'row',
+    height: '100%',
+    maxHeight: '90vh',
+    overflowY: isMobile ? 'auto' : 'hidden',
+});
+
+const screenshotContainerStyle = (isMobile) => ({
+    flex: isMobile ? '0 0 auto' : '1 1 55%',
+    minWidth: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: isMobile ? '60px 20px 20px' : '24px',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+});
+
+const screenshotPlaceholderStyle = {
+    width: '100%',
+    aspectRatio: '3 / 2',
+    maxHeight: '70vh',
+    background: 'linear-gradient(135deg, rgba(255, 200, 50, 0.1) 0%, rgba(180, 140, 30, 0.2) 100%)',
     borderRadius: '12px',
-    fontSize: '0.75em',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '1px solid rgba(255, 200, 50, 0.2)',
+};
+
+const screenshotPlaceholderTextStyle = {
+    color: 'rgba(255, 200, 50, 0.4)',
+    fontSize: '1.1em',
     fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: '1.8',
+};
+
+const descriptionContainerStyle = (isMobile) => ({
+    flex: isMobile ? '1 1 auto' : '1 1 45%',
+    padding: isMobile ? '24px 20px 32px' : '40px 32px',
+    overflowY: isMobile ? 'visible' : 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: isMobile ? 'flex-start' : 'center',
+});
+
+const modalTitleStyle = {
+    fontSize: 'clamp(1.5em, 3vw, 2em)',
+    fontWeight: '700',
+    marginBottom: '20px',
+    color: '#FFD700',
+    lineHeight: '1.2',
+};
+
+const modalDescriptionStyle = {
+    fontSize: '1.05em',
+    color: 'rgba(255, 255, 255, 0.85)',
+    lineHeight: '1.8',
+    margin: 0,
 };
