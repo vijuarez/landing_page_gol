@@ -5,20 +5,19 @@ import { MAX_AGE } from '../workers/gameOfLife.worker';
 // Rendering Constants (easily tunable)
 // ============================================
 const CELL_SIZE = 8; // pixels
-const COLOR = { r: 255, g: 190, b: 50 }; // Warm amber/gold
+const COLOR = { r: 235, g: 170, b: 30 }; // Warm amber/gold
 
 // Opacity settings
-const MIN_OPACITY = 0.2;     // Opacity at age 1 (50%)
+const MIN_OPACITY = 0.1;     // Opacity at age 1 (20%)
 const MAX_OPACITY = 1.0;     // Maximum opacity (100%)
 const SIGMOID_CENTER = MAX_AGE / 2;   // Age at which opacity is ~75%
-const SIGMOID_STEEPNESS = 0.3; // How quickly opacity changes (higher = steeper)
+const SIGMOID_STEEPNESS = 0.1; // How quickly opacity changes (higher = steeper)
 
 /**
  * Calculate opacity from cell age using sigmoid function
  * - Age 0: not displayed
- * - Age 1: MIN_OPACITY (50%)
- * - Age → ∞: approaches MAX_OPACITY (100%)
- * - At SIGMOID_CENTER: ~75% opacity
+ * - Age 1: MIN_OPACITY
+ * - Age → ∞: approaches MAX_OPACITY
  */
 function ageToOpacity(age) {
     if (age <= 0) return 0;
@@ -70,7 +69,7 @@ export function GameOfLifeCanvas({ cellAges }) {
             const imageData = ctx.createImageData(width, height);
             const data = imageData.data;
 
-            // Draw cells with age-based opacity
+            // Draw cells with age-based opacity (Manual Lerp)
             for (const [cellKey, age] of currentCellAges) {
                 if (age <= 0) continue; // Skip dead cells
 
@@ -83,7 +82,11 @@ export function GameOfLifeCanvas({ cellAges }) {
 
                 // Calculate opacity from age
                 const opacity = ageToOpacity(age);
-                const alpha = Math.floor(opacity * 255);
+
+                // Manual Lerp: Color * Opacity (assuming black background)
+                const r = Math.floor(COLOR.r * opacity);
+                const g = Math.floor(COLOR.g * opacity);
+                const b = Math.floor(COLOR.b * opacity);
 
                 // Fill cellSize × cellSize block
                 for (let dy = 0; dy < CELL_SIZE; dy++) {
@@ -93,10 +96,10 @@ export function GameOfLifeCanvas({ cellAges }) {
 
                         if (pixelX < width && pixelY < height) {
                             const idx = (pixelY * width + pixelX) * 4;
-                            data[idx] = COLOR.r;
-                            data[idx + 1] = COLOR.g;
-                            data[idx + 2] = COLOR.b;
-                            data[idx + 3] = alpha;
+                            data[idx] = r;
+                            data[idx + 1] = g;
+                            data[idx + 2] = b;
+                            data[idx + 3] = 255; // Full Alpha
                         }
                     }
                 }

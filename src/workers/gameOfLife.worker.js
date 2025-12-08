@@ -11,7 +11,7 @@
 const AGE_GAIN_RATE = 15;    // Age increase per step when alive
 const AGE_DECAY_RATE = 8;   // Age decrease per step when dead
 const INITIAL_AGE = 1;      // Age for newly born cells
-export const MAX_AGE = 50;         // Maximum age for cells
+export const MAX_AGE = 80;         // Maximum age for cells
 
 // Simulation state (The Truth)
 let aliveCells = new Set();
