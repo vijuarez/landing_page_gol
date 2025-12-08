@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import ReactMarkdown from 'react-markdown';
+import mdStyle from './md-style.module.css';
+
 /**
  * Portfolio data structure - customize with your own projects
  * 
@@ -11,18 +14,31 @@ const portfolioData = [
     {
         id: 'project-1',
         title: 'Project One',
-        shortDescription: 'A brief overview of this amazing project',
+        shortDescription: 'An AI assistant for domain-specific guidance, powered by Gemini API and a custom RAG system tuned for accuracy and source attribution.',
         extendedDescription: 'This is a detailed description of the project. It explains the technologies used, the challenges faced, and the solutions implemented. You can add multiple paragraphs here to fully describe your work, the impact it had, and what you learned from the experience.',
         thumbnail: '/images/project1-thumb.jpg',
         screenshot: '/images/project1-full.jpg',
     },
     {
-        id: 'project-2',
-        title: 'Project Two',
-        shortDescription: 'Another incredible project showcase',
-        extendedDescription: 'Detailed explanation of this second project. Include information about your role, the tech stack, key features, and any metrics or outcomes that demonstrate success. This is your opportunity to tell the full story behind your work.',
-        thumbnail: '/images/project2-thumb.jpg',
-        screenshot: '/images/project2-full.jpg',
+        id: 'project-1',
+        title: 'Project One',
+        shortDescription: 'Brief overview...',
+        extendedDescription: `
+## Overview
+An AI assistant powered by **Gemini API**.
+
+### Features
+- Custom RAG system
+- Source attribution
+- Domain-specific guidance
+
+### Tech Stack
+\`React\`, \`Node.js\`, \`Gemini API\`
+
+> Built with a focus on accuracy and reliability.
+    `,
+        thumbnail: '/images/project1-thumb.jpg',
+        screenshot: '/images/project1-full.jpg',
     },
     {
         id: 'project-3',
@@ -125,7 +141,9 @@ export function PortfolioGallery() {
                             {/* Description Section */}
                             <div style={descriptionContainerStyle(isMobile)}>
                                 <h2 style={modalTitleStyle}>{selectedProject.title}</h2>
-                                <p style={modalDescriptionStyle}>{selectedProject.extendedDescription}</p>
+                                <div className={mdStyle.reactMarkdown}>
+                                    <ReactMarkdown>{selectedProject.extendedDescription}</ReactMarkdown>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -188,6 +206,8 @@ const projectInfoStyle = {
     padding: '20px',
     backdropFilter: 'blur(10px)',
     background: 'rgba(0, 0, 0, 0.6)',
+    height: '100%',
+    overflowY: 'scroll',
 };
 
 const projectTitleStyle = {
@@ -308,11 +328,4 @@ const modalTitleStyle = {
     marginBottom: '20px',
     color: '#FFD700',
     lineHeight: '1.2',
-};
-
-const modalDescriptionStyle = {
-    fontSize: '1.05em',
-    color: 'rgba(255, 255, 255, 0.85)',
-    lineHeight: '1.8',
-    margin: 0,
 };

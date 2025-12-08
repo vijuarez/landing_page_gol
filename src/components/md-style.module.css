@@ -1,0 +1,9 @@
+.reactMarkdown {
+    font-size: 1.05em;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.8;
+}
+
+.reactMarkdown ul {
+    margin-left: 2em;
+}
