@@ -21,12 +21,25 @@ function App() {
     }, [activate]);
 
     useEffect(() => {
-        // Attach to document for global capture
-        document.addEventListener('mousemove', handleMouseMove);
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
+        // Handle touch events separately (for mobile drag)
+        const handleTouchMove = (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                const cellX = Math.floor(touch.clientX / CELL_SIZE);
+                const cellY = Math.floor(touch.clientY / CELL_SIZE);
+                activate(cellX, cellY, 5);
+            }
         };
-    }, [handleMouseMove]);
+
+        // Attach to document for global capture
+        document.addEventListener('pointermove', handleMouseMove);
+        document.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+        return () => {
+            document.removeEventListener('pointermove', handleMouseMove);
+            document.removeEventListener('touchmove', handleTouchMove);
+        };
+    }, [handleMouseMove, activate]);
 
     return (
         <>
