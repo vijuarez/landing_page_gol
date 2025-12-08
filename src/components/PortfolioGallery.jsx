@@ -84,13 +84,13 @@ export function PortfolioGallery() {
     }, [selectedProject]);
 
     return (
-        <div style={containerStyle}>
+        <div style={containerStyle(isMobile)}>
             {/* Project Cards */}
-            <div style={gridStyle}>
+            <div style={gridStyle(isMobile)}>
                 {portfolioData.map((project) => (
                     <div
                         key={project.id}
-                        style={projectCardStyle}
+                        style={projectCardStyle(isMobile)}
                         onClick={() => setSelectedProject(project)}
                         role="button"
                         tabIndex={0}
@@ -111,7 +111,7 @@ export function PortfolioGallery() {
 
             {/* Modal Overlay - Rendered via portal to bypass translateX */}
             {selectedProject && createPortal(
-                <div style={modalOverlayStyle} onClick={() => setSelectedProject(null)}>
+                <div style={modalOverlayStyle(isMobile)} onClick={() => setSelectedProject(null)}>
                     <div style={modalContentStyle(isMobile)} onClick={(e) => e.stopPropagation()}>
                         {/* Close Button */}
                         <button
@@ -158,28 +158,28 @@ export function PortfolioGallery() {
 // Gallery Styles
 // ============================================
 
-const containerStyle = {
-    padding: '20px',
+const containerStyle = (isMobile) => ({
+    padding: isMobile ? '0' : '20px',
     height: '100%',
     overflowY: 'auto',
-};
+});
 
-const gridStyle = {
+const gridStyle = (isMobile) => ({
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '24px',
-    maxWidth: '1200px',
+    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '2em',
+    maxWidth: isMobile ? '100%' : '1200px',
     margin: '0 auto',
-};
+});
 
-const projectCardStyle = {
+const projectCardStyle = (isMobile) => ({
     backgroundColor: 'rgba(255, 200, 50, 0.05)',
-    borderRadius: '16px',
+    borderRadius: isMobile ? '12px' : '16px',
     overflow: 'hidden',
     border: '1px solid rgba(255, 200, 50, 0.2)',
     transition: 'all 0.3s ease',
     cursor: 'pointer',
-};
+});
 
 const thumbnailContainerStyle = {
     width: '100%',
@@ -228,7 +228,7 @@ const projectDescStyle = {
 // Modal Styles (Responsive)
 // ============================================
 
-const modalOverlayStyle = {
+const modalOverlayStyle = (isMobile) => ({
     position: 'fixed',
     top: 0,
     left: 0,
@@ -237,23 +237,24 @@ const modalOverlayStyle = {
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
     backdropFilter: 'blur(8px)',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: isMobile ? 'stretch' : 'center',
     justifyContent: 'center',
     zIndex: 1000,
-    padding: '20px',
+    padding: isMobile ? '0' : '20px',
     pointerEvents: 'auto',
-};
+});
 
 const modalContentStyle = (isMobile) => ({
     position: 'relative',
     backgroundColor: 'rgba(20, 20, 20, 0.95)',
-    borderRadius: '20px',
-    border: '1px solid rgba(255, 200, 50, 0.3)',
+    borderRadius: isMobile ? '0' : '20px',
+    border: isMobile ? 'none' : '1px solid rgba(255, 200, 50, 0.3)',
     maxWidth: isMobile ? '100%' : '1100px',
-    maxHeight: '90vh',
+    maxHeight: isMobile ? '100%' : '90vh',
     width: '100%',
+    height: isMobile ? '100%' : 'auto',
     overflow: 'hidden',
-    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+    boxShadow: isMobile ? 'none' : '0 25px 50px rgba(0, 0, 0, 0.5)',
 });
 
 const closeButtonStyle = {
@@ -298,11 +299,9 @@ const screenshotPlaceholderStyle = {
     aspectRatio: '3 / 2',
     maxHeight: '70vh',
     background: 'linear-gradient(135deg, rgba(255, 200, 50, 0.1) 0%, rgba(180, 140, 30, 0.2) 100%)',
-    borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: '1px solid rgba(255, 200, 50, 0.2)',
 };
 
 const screenshotPlaceholderTextStyle = {

@@ -390,7 +390,6 @@ const portfolioContentStyle = {
     overflow: 'auto',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: '12px',
-    border: '1px solid rgba(255, 200, 50, 0.2)',
     minHeight: 0,
-    pointerEvents: 'auto', // Re-enable pointer events for portfolio content
+    pointerEvents: 'auto',
 };
