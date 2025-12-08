@@ -20,7 +20,7 @@ const portfolioData = [
         screenshot: '/images/project1-full.jpg',
     },
     {
-        id: 'project-1',
+        id: 'project-2',
         title: 'Project One',
         shortDescription: 'Brief overview...',
         extendedDescription: `
