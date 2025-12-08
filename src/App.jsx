@@ -11,13 +11,13 @@ const CELL_SIZE = 8;
  * Captures mouse movement globally to activate cells
  */
 function App() {
-    const { aliveCells, activate, triggerWave } = useGameOfLife();
+    const { cellAges, activate, triggerWave } = useGameOfLife();
 
     // Global mouse tracking - captures movement anywhere on the page
     const handleMouseMove = useCallback((e) => {
         const cellX = Math.floor(e.clientX / CELL_SIZE);
         const cellY = Math.floor(e.clientY / CELL_SIZE);
-        activate(cellX, cellY, 5);
+        activate(cellX, cellY, 4);
     }, [activate]);
 
     useEffect(() => {
@@ -27,7 +27,7 @@ function App() {
                 const touch = e.touches[0];
                 const cellX = Math.floor(touch.clientX / CELL_SIZE);
                 const cellY = Math.floor(touch.clientY / CELL_SIZE);
-                activate(cellX, cellY, 5);
+                activate(cellX, cellY, 4);
             }
         };
 
@@ -43,7 +43,7 @@ function App() {
 
     return (
         <>
-            <GameOfLifeCanvas aliveCells={aliveCells} />
+            <GameOfLifeCanvas cellAges={cellAges} />
             <MainContent triggerWave={triggerWave} />
         </>
     );

@@ -2,9 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 /**
  * Custom hook to manage Game of Life state and worker communication
+ * Now tracks cell ages for fade-in/fade-out effects
  */
 export function useGameOfLife() {
-    const [aliveCells, setAliveCells] = useState(new Set());
+    // Changed from Set to Map to store cell ages
+    const [cellAges, setCellAges] = useState(new Map());
     const workerRef = useRef(null);
     const cellCountRef = useRef(0);
 
@@ -17,10 +19,11 @@ export function useGameOfLife() {
             );
 
             workerRef.current.onmessage = (e) => {
-                const { aliveCells: cellArray } = e.data;
-                const newSet = new Set(cellArray);
-                setAliveCells(newSet);
-                cellCountRef.current = newSet.size;
+                // Worker now sends cellAges as array of [key, age] pairs
+                const { cellAges: agesArray } = e.data;
+                const newMap = new Map(agesArray);
+                setCellAges(newMap);
+                cellCountRef.current = newMap.size;
             };
 
             workerRef.current.onerror = (error) => {
@@ -61,7 +64,7 @@ export function useGameOfLife() {
     }, []);
 
     // Activate cells around a point
-    const activate = useCallback((cellX, cellY, radius = 3) => {
+    const activate = useCallback((cellX, cellY, radius) => {
         if (workerRef.current) {
             workerRef.current.postMessage({
                 type: 'activate',
@@ -79,5 +82,5 @@ export function useGameOfLife() {
         }
     }, []);
 
-    return { aliveCells, activate, triggerWave, cellCount: cellCountRef.current };
+    return { cellAges, activate, triggerWave, cellCount: cellCountRef.current };
 }

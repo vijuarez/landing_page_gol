@@ -2,24 +2,38 @@
 /**
  * Game of Life Web Worker
  * Runs Game of Life updates asynchronously (~20 FPS), independent of render thread.
+ * Tracks cell "age" for fade-in/fade-out visual effects.
  */
 
+// ============================================
+// Aging Constants (easily tunable)
+// ============================================
+const AGE_GAIN_RATE = 15;    // Age increase per step when alive
+const AGE_DECAY_RATE = 8;   // Age decrease per step when dead
+const INITIAL_AGE = 1;      // Age for newly born cells
+export const MAX_AGE = 50;         // Maximum age for cells
+
+// Simulation state (The Truth)
 let aliveCells = new Set();
+
+// Visual state (The Trail)
+let cellAges = new Map();
+
 let gridWidth = 0;
 let gridHeight = 0;
 let maxAlive = 10000;
 let waveTime = 0;
 
 /**
- * Standard Conway's Game of Life step
+ * Standard Conway's Game of Life step with age tracking
  * Rules: 2-3 neighbors survive, exactly 3 neighbors birth
+ * Note: Only cells with age >= INITIAL_AGE are considered "alive" for simulation.
+ *       Cells with 0 < age < INITIAL_AGE are "decaying" (visual trail only, dead for rules).
  */
 function gameOfLifeStep() {
-    if (aliveCells.size === 0) return;
-
     const neighbors = new Map();
 
-    // Count neighbors for all cells adjacent to alive cells
+    // 1. SIMULATION STEP: Count neighbors based on aliveCells (The Truth)
     for (const cellKey of aliveCells) {
         const [x, y] = cellKey.split(',').map(Number);
 
@@ -38,7 +52,7 @@ function gameOfLifeStep() {
     for (const [cellKey, count] of neighbors) {
         const isAlive = aliveCells.has(cellKey);
 
-        // Standard rules: 2-3 neighbors survive (count includes self, so 3-4), 3 neighbors birth
+        // Standard rules: 2-3 neighbors survive (count includes self), 3 neighbors birth
         if ((isAlive && (count === 3 || count === 4)) || (!isAlive && count === 3)) {
             // Enforce grid boundaries
             const [x, y] = cellKey.split(',').map(Number);
@@ -55,40 +69,75 @@ function gameOfLifeStep() {
     } else {
         aliveCells = nextGen;
     }
+
+    // 2. VISUALIZATION STEP: Update ages based on new aliveCells
+    const nextAges = new Map();
+
+    // Process all currently visible cells (alive or decaying)
+    // We need to check both the new alive cells AND the old visible cells
+    const allKeys = new Set([...aliveCells, ...cellAges.keys()]);
+
+    for (const key of allKeys) {
+        const isNowAlive = aliveCells.has(key);
+        const currentAge = cellAges.get(key) || 0;
+        let newAge = 0;
+
+        if (isNowAlive) {
+            // Alive: Gain age, capped at MAX_AGE
+            newAge = Math.min(currentAge + AGE_GAIN_RATE, MAX_AGE);
+        } else {
+            // Dead: Decay
+            newAge = currentAge - AGE_DECAY_RATE;
+        }
+
+        // Keep if visible
+        if (newAge > 0) {
+            nextAges.set(key, newAge);
+        }
+    }
+
+    cellAges = nextAges;
 }
 
 /**
- * Activate cells in a circular radius around a point
+ * Dual-Zone Interaction:
+ * - Inner Radius (<= 2): Eraser (kills cells, resets age)
+ * - Outer Radius (> 2): Creator (spawns new cells)
  */
 function activateRadius(centerX, centerY, radius) {
-    const toAdd = [];
+    const innerRadius = 3; // Eraser size
 
     for (let dx = -radius; dx <= radius; dx++) {
         for (let dy = -radius; dy <= radius; dy++) {
-            if (dx * dx + dy * dy <= radius * radius) {
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq <= radius * radius) {
                 const x = centerX + dx;
                 const y = centerY + dy;
+                const key = `${x},${y}`;
 
-                if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
-                    const key = `${x},${y}`;
-                    if (!aliveCells.has(key)) {
-                        toAdd.push(key);
+                // Check if inside inner eraser radius
+                if (distSq <= innerRadius * innerRadius) {
+                    // ERASER: Kill cell and clear trail
+                    if (aliveCells.has(key)) aliveCells.delete(key);
+                    if (cellAges.has(key)) cellAges.delete(key);
+                } else {
+                    // CREATOR: Spawn new cell if space available
+                    if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
+                        if (!aliveCells.has(key)) {
+                            if (aliveCells.size < maxAlive) {
+                                aliveCells.add(key);
+                                if (!cellAges.has(key)) {
+                                    cellAges.set(key, INITIAL_AGE);
+                                }
+                            }
+                        } else {
+                            cellAges.set(key, Math.min(cellAges.get(key) + Math.floor(AGE_GAIN_RATE / 3), MAX_AGE));
+                        }
                     }
                 }
             }
         }
-    }
-
-    // Shuffle to add random cells if near cap
-    for (let i = toAdd.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [toAdd[i], toAdd[j]] = [toAdd[j], toAdd[i]];
-    }
-
-    // Add until cap
-    for (const key of toAdd) {
-        if (aliveCells.size >= maxAlive) break;
-        aliveCells.add(key);
     }
 }
 
@@ -110,6 +159,9 @@ function activateWave() {
                 const key = `${x},${y}`;
                 if (aliveCells.size < maxAlive) {
                     aliveCells.add(key);
+                    if (!cellAges.has(key)) {
+                        cellAges.set(key, INITIAL_AGE);
+                    }
                 }
             }
         }
@@ -122,10 +174,16 @@ function activateWave() {
  * Spawn initial random cells to seed the simulation
  */
 function spawnInitialCells(count = 500) {
-    for (let i = 0; i < count && aliveCells.size < maxAlive; i++) {
+    let added = 0;
+    while (added < count && aliveCells.size < maxAlive) {
         const x = Math.floor(Math.random() * gridWidth);
         const y = Math.floor(Math.random() * gridHeight);
-        aliveCells.add(`${x},${y}`);
+        const key = `${x},${y}`;
+        if (!aliveCells.has(key)) {
+            aliveCells.add(key);
+            cellAges.set(key, INITIAL_AGE);
+            added++;
+        }
     }
 }
 
@@ -136,7 +194,10 @@ function startLoop() {
     if (intervalId) return;
     intervalId = setInterval(() => {
         gameOfLifeStep();
-        self.postMessage({ aliveCells: Array.from(aliveCells) });
+        // Send cell ages as array of [key, age] pairs
+        self.postMessage({
+            cellAges: Array.from(cellAges.entries())
+        });
     }, 50);
 }
 
@@ -149,10 +210,11 @@ self.onmessage = (e) => {
         gridHeight = payload.height;
         maxAlive = payload.maxAlive || 10000;
         aliveCells = new Set();
+        cellAges = new Map();
         spawnInitialCells(500);
         startLoop();
     } else if (type === 'activate') {
-        activateRadius(payload.centerX, payload.centerY, payload.radius || 10);
+        activateRadius(payload.centerX, payload.centerY, payload.radius);
     } else if (type === 'wave') {
         activateWave();
     } else if (type === 'resize') {
@@ -160,3 +222,4 @@ self.onmessage = (e) => {
         gridHeight = payload.height;
     }
 };
+
