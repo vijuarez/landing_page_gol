@@ -84,6 +84,7 @@ export function MainContent({ triggerWave }) {
  * Welcome page with header, navigation buttons, and footer
  */
 function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
+    const [showAboutModal, setShowAboutModal] = useState(false);
     return (
         <div style={welcomeContainerStyle}>
             {/* Header - Fixed at top */}
@@ -110,14 +111,41 @@ function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
 
             {/* Footer Links */}
             <footer style={footerStyle}>
-                <a href="mailto:vijuarez97@gmail.com" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                <a className="main-button" href="mailto:vijuarez97@gmail.com" target="_blank" rel="noopener noreferrer" style={linkStyle}>
                     Email
                 </a>
                 <span style={dividerStyle}>•</span>
-                <a href="https://github.com/vijuarez" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                <a className="main-button" href="https://github.com/vijuarez" target="_blank" rel="noopener noreferrer" style={linkStyle}>
                     GitHub
                 </a>
+                <span style={dividerStyle}>•</span>
+                <a className="main-button" href="#" onClick={(e) => { e.preventDefault(); setShowAboutModal(true); }} style={linkStyle}>
+                    About
+                </a>
             </footer>
+
+            {/* About Modal */}
+            {showAboutModal && (
+                <div style={aboutModalOverlayStyle} onClick={() => setShowAboutModal(false)}>
+                    <div style={aboutModalContentStyle} onClick={(e) => e.stopPropagation()}>
+                        <button style={aboutCloseButtonStyle} onClick={() => setShowAboutModal(false)}>×</button>
+                        <h2 style={{ marginTop: 0, color: '#FFD700', fontFamily: 'Quicksand', fontWeight: '300' }}>About</h2>
+                        <p>
+                            Welcome to my interactive portfolio! This site is built with React and features a neat
+                            Game of Life simulation running on a background canvas. Move your mouse (or drag your finger!) modify the simulation.
+                        </p>
+                        <br></br>
+                        <p>
+                            I made this as a recreation of <a href="https://github.com/vijuarez/vijuarez.github.io" target="_blank" rel="noopener noreferrer" style={linkStyle}>a previous homepage</a> I made with Flutter some years ago.
+                            It was a fun refresher for React and gave the chance to play with some agentic workflows. As always, I learned a lot.
+                        </p>
+                        <br></br>
+                        <p>
+                            Feel free to explore my projects and CV!
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -293,7 +321,6 @@ const footerStyle = {
 const linkStyle = {
     color: '#FFD700',
     textDecoration: 'none',
-    fontSize: '1.1em',
     width: '8em',
     textAlign: 'center',
     transition: 'color 0.2s ease',
@@ -392,4 +419,51 @@ const portfolioContentStyle = {
     borderRadius: '12px',
     minHeight: 0,
     pointerEvents: 'auto',
+};
+
+// ============================================
+// About Modal Styles
+// ============================================
+
+const aboutModalOverlayStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backdropFilter: 'blur(5px)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2000,
+    pointerEvents: 'auto',
+};
+
+const aboutModalContentStyle = {
+    backgroundColor: 'rgba(20, 20, 20, 0.75)',
+    border: '1px solid rgba(255, 200, 50, 0.3)',
+    borderRadius: '12px',
+    padding: '40px',
+    maxWidth: '500px',
+    width: '90%',
+    position: 'relative',
+    color: '#e0e0e0',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+    fontFamily: 'Inter, sans-serif',
+    lineHeight: '1.6',
+};
+
+const aboutCloseButtonStyle = {
+    position: 'absolute',
+    top: '15px',
+    right: '20px',
+    background: 'none',
+    border: 'none',
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: '28px',
+    cursor: 'pointer',
+    padding: '0',
+    lineHeight: 1,
+    transition: 'color 0.2s',
 };
