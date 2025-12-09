@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 export function useGameOfLife() {
     // Changed from Set to Map to store cell ages
     const [cellAges, setCellAges] = useState(new Map());
+    const [gridWidth, setGridWidth] = useState(0);
     const workerRef = useRef(null);
     const cellCountRef = useRef(0);
 
@@ -30,21 +31,24 @@ export function useGameOfLife() {
                 console.error('Game of Life Worker error:', error);
             };
 
-            // Send initial grid dimensions (1.2x screen size for "endless" effect)
             const cellSize = 8;
             const scaleFactor = 1.5;
+            const initialWidth = Math.floor((window.innerWidth * scaleFactor) / cellSize);
+            setGridWidth(initialWidth);
             workerRef.current.postMessage({
                 type: 'init',
-                width: Math.floor((window.innerWidth * scaleFactor) / cellSize),
+                width: initialWidth,
                 height: Math.floor((window.innerHeight * scaleFactor) / cellSize),
                 maxAlive: 25000,
             });
 
             const handleResize = () => {
                 if (workerRef.current) {
+                    const newWidth = Math.floor((window.innerWidth * scaleFactor) / cellSize);
+                    setGridWidth(newWidth);
                     workerRef.current.postMessage({
                         type: 'resize',
-                        width: Math.floor((window.innerWidth * scaleFactor) / cellSize),
+                        width: newWidth,
                         height: Math.floor((window.innerHeight * scaleFactor) / cellSize),
                     });
                 }
@@ -82,5 +86,5 @@ export function useGameOfLife() {
         }
     }, []);
 
-    return { cellAges, activate, triggerWave, cellCount: cellCountRef.current };
+    return { cellAges, activate, triggerWave, cellCount: cellCountRef.current, gridWidth };
 }

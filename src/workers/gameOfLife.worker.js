@@ -24,6 +24,11 @@ let gridHeight = 0;
 let maxAlive = 10000;
 let waveTime = 0;
 
+const encodeCell = (x, y) => x + y * gridWidth;
+export const decodeCell = (key, width) => {
+    return [key % width, ~~(key / width)];
+};
+
 /**
  * Standard Conway's Game of Life step with age tracking
  * Rules: 2-3 neighbors survive, exactly 3 neighbors birth
@@ -35,13 +40,13 @@ function gameOfLifeStep() {
 
     // 1. SIMULATION STEP: Count neighbors based on aliveCells (The Truth)
     for (const cellKey of aliveCells) {
-        const [x, y] = cellKey.split(',').map(Number);
+        const [x, y] = decodeCell(cellKey, gridWidth);
 
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
                 const nx = x + dx;
                 const ny = y + dy;
-                const nKey = `${nx},${ny}`;
+                const nKey = encodeCell(nx, ny);
                 neighbors.set(nKey, (neighbors.get(nKey) || 0) + 1);
             }
         }
@@ -55,7 +60,7 @@ function gameOfLifeStep() {
         // Standard rules: 2-3 neighbors survive (count includes self), 3 neighbors birth
         if ((isAlive && (count === 3 || count === 4)) || (!isAlive && count === 3)) {
             // Enforce grid boundaries
-            const [x, y] = cellKey.split(',').map(Number);
+            const [x, y] = decodeCell(cellKey, gridWidth);
             if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
                 nextGen.add(cellKey);
             }
@@ -114,7 +119,7 @@ function activateRadius(centerX, centerY, radius) {
             if (distSq <= radius * radius) {
                 const x = centerX + dx;
                 const y = centerY + dy;
-                const key = `${x},${y}`;
+                const key = encodeCell(x, y);
 
                 // Check if inside inner eraser radius
                 if (distSq <= innerRadius * innerRadius) {
@@ -156,7 +161,7 @@ function activateWave() {
 
         if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
             if (Math.random() < 0.5) {
-                const key = `${x},${y}`;
+                const key = encodeCell(x, y);
                 if (aliveCells.size < maxAlive) {
                     aliveCells.add(key);
                     if (!cellAges.has(key)) {
@@ -178,7 +183,7 @@ function spawnInitialCells(count = 500) {
     while (added < count && aliveCells.size < maxAlive) {
         const x = Math.floor(Math.random() * gridWidth);
         const y = Math.floor(Math.random() * gridHeight);
-        const key = `${x},${y}`;
+        const key = encodeCell(x, y);
         if (!aliveCells.has(key)) {
             aliveCells.add(key);
             cellAges.set(key, INITIAL_AGE);
@@ -206,6 +211,7 @@ self.onmessage = (e) => {
     const { type, ...payload } = e.data;
 
     if (type === 'init') {
+        console.log(payload)
         gridWidth = payload.width;
         gridHeight = payload.height;
         maxAlive = payload.maxAlive || 10000;

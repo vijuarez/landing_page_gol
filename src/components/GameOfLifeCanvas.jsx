@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { MAX_AGE } from '../workers/gameOfLife.worker';
+import { decodeCell, MAX_AGE } from '../workers/gameOfLife.worker';
 
 // ============================================
 // Rendering Constants (easily tunable)
@@ -32,15 +32,20 @@ function ageToOpacity(age) {
  * Full-screen canvas rendering Game of Life cells via ImageData
  * Cells fade in/out based on their age using sigmoid-based opacity
  */
-export function GameOfLifeCanvas({ cellAges }) {
+export function GameOfLifeCanvas({ cellAges, gridWidth }) {
     const canvasRef = useRef(null);
     const animationFrameRef = useRef(null);
     const cellAgesRef = useRef(cellAges);
+    const gridWidthRef = useRef(gridWidth);
 
-    // Keep ref in sync with prop
+    // Keep refs in sync with props
     useEffect(() => {
         cellAgesRef.current = cellAges;
     }, [cellAges]);
+
+    useEffect(() => {
+        gridWidthRef.current = gridWidth;
+    }, [gridWidth]);
 
     // Setup canvas and render loop
     useEffect(() => {
@@ -73,7 +78,7 @@ export function GameOfLifeCanvas({ cellAges }) {
             for (const [cellKey, age] of currentCellAges) {
                 if (age <= 0) continue; // Skip dead cells
 
-                const [x, y] = cellKey.split(',').map(Number);
+                const [x, y] = decodeCell(cellKey, gridWidthRef.current);
                 const px = x * CELL_SIZE;
                 const py = y * CELL_SIZE;
 
