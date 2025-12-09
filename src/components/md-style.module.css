@@ -4,6 +4,6 @@
     line-height: 1.8;
 }
 
-.reactMarkdown ul {
+.reactMarkdown ul, ol {
     margin-left: 2em;
 }
