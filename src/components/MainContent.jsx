@@ -263,7 +263,7 @@ const welcomeContainerStyle = {
 const headerStyle = {
     textAlign: 'center',
     fontFamily: 'Quicksand',
-    fontWeight: '300',
+    textShadow: 'rgb(233 175 175) 0px 0px 1.5em',
 };
 
 const titleStyle = {
@@ -273,6 +273,7 @@ const titleStyle = {
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
+    fontWeight: '300',
 };
 
 const subtitleStyle = {
@@ -281,6 +282,7 @@ const subtitleStyle = {
     color: 'rgba(255, 255, 255, 0.7)',
     letterSpacing: '3px',
     textTransform: 'uppercase',
+    fontWeight: '400',
 };
 
 const navStyle = {
