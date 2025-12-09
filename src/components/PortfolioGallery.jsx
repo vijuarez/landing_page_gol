@@ -133,9 +133,12 @@ export function PortfolioGallery() {
                         onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(project)}
                     >
                         <div style={thumbnailContainerStyle}>
-                            <div style={placeholderImageStyle}>
-                                <span style={placeholderTextStyle}>{project.title}</span>
-                            </div>
+                            <img
+                                src={project.thumbnail}
+                                alt={project.title}
+                                style={imageStyle}
+                                loading="lazy"
+                            />
                         </div>
                         <div style={projectInfoStyle}>
                             <h3 style={projectTitleStyle}>{project.title}</h3>
@@ -165,13 +168,11 @@ export function PortfolioGallery() {
                         <div style={modalInnerStyle(isMobile)}>
                             {/* Screenshot Section */}
                             <div style={screenshotContainerStyle(isMobile)}>
-                                <div style={screenshotPlaceholderStyle}>
-                                    <span style={screenshotPlaceholderTextStyle}>
-                                        {selectedProject.title}
-                                        <br />
-                                        <small>1200×800px screenshot</small>
-                                    </span>
-                                </div>
+                                <img
+                                    src={selectedProject.screenshot}
+                                    alt={`${selectedProject.title} screenshot`}
+                                    style={screenshotImageStyle}
+                                />
                             </div>
 
                             {/* Description Section */}
@@ -223,19 +224,11 @@ const thumbnailContainerStyle = {
     overflow: 'hidden',
 };
 
-const placeholderImageStyle = {
+const imageStyle = {
     width: '100%',
     height: '100%',
-    background: 'linear-gradient(135deg, rgba(255, 200, 50, 0.15) 0%, rgba(180, 140, 30, 0.25) 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-};
-
-const placeholderTextStyle = {
-    color: 'rgba(255, 200, 50, 0.5)',
-    fontSize: '1.2em',
-    fontWeight: '500',
+    objectFit: 'cover',
+    display: 'block',
 };
 
 const projectInfoStyle = {
@@ -330,22 +323,13 @@ const screenshotContainerStyle = (isMobile) => ({
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
 });
 
-const screenshotPlaceholderStyle = {
+const screenshotImageStyle = {
     width: '100%',
-    aspectRatio: '3 / 2',
+    height: 'auto',
     maxHeight: '70vh',
-    background: 'linear-gradient(135deg, rgba(255, 200, 50, 0.1) 0%, rgba(180, 140, 30, 0.2) 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-};
-
-const screenshotPlaceholderTextStyle = {
-    color: 'rgba(255, 200, 50, 0.4)',
-    fontSize: '1.1em',
-    fontWeight: '500',
-    textAlign: 'center',
-    lineHeight: '1.8',
+    objectFit: 'contain',
+    display: 'block',
+    borderRadius: '4px',
 };
 
 const descriptionContainerStyle = (isMobile) => ({
