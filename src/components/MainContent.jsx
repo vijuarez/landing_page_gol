@@ -132,12 +132,12 @@ function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
                         <h2 style={{ marginTop: 0, color: '#FFD700', fontFamily: 'Quicksand', fontWeight: '300' }}>About</h2>
                         <p>
                             Welcome to my interactive portfolio! This site is built with React and features a neat
-                            Game of Life simulation running on a background canvas. Move your mouse (or drag your finger!) modify the simulation.
+                            Game of Life simulation running on a background canvas. Move your mouse (or drag your finger) modify the simulation.
                         </p>
                         <br></br>
                         <p>
                             I made this as a recreation of <a href="https://github.com/vijuarez/vijuarez.github.io" target="_blank" rel="noopener noreferrer" style={linkStyle}>a previous homepage</a> I made with Flutter some years ago.
-                            It was a fun refresher for React and gave the chance to play with some agentic workflows. As always, I learned a lot.
+                            It was a fun refresher for React and gave me the chance to play with some agentic workflows.
                         </p>
                         <br></br>
                         <p>
