@@ -234,12 +234,13 @@ const welcomeContainerStyle = {
 
 const headerStyle = {
     textAlign: 'center',
+    fontFamily: 'Quicksand',
+    fontWeight: '300',
 };
 
 const titleStyle = {
     fontSize: 'clamp(2.5em, 6vw, 4em)',
     margin: '0 0 16px 0',
-    fontWeight: '700',
     background: 'linear-gradient(135deg, #ffffff 0%, #FFD700 100%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -250,7 +251,6 @@ const subtitleStyle = {
     fontSize: 'clamp(1em, 2.5vw, 1.4em)',
     margin: 0,
     color: 'rgba(255, 255, 255, 0.7)',
-    fontWeight: '300',
     letterSpacing: '3px',
     textTransform: 'uppercase',
 };
