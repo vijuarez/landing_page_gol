@@ -177,7 +177,7 @@ Welcome to my interactive portfolio! This site is built with React and features 
 I made this as a recreation of [a previous homepage](https://github.com/vijuarez/vijuarez.github.io) I made with Flutter some years ago. It was a fun refresher for React and gave me the chance to play with some agentic workflows.
 
 
-Feel free to explore my projects and CV!
+Feel free to explore my projects and resume!
         `
     },
 };

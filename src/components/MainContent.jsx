@@ -103,7 +103,7 @@ function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
                     <svg className={styles.arrowIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
-                    Curriculum Vitae
+                    Resume
                 </button>
                 <button onClick={onNavigatePortfolio} className={styles.primaryButton}>
                     Portfolio
@@ -153,7 +153,7 @@ function CVPage({ onBack }) {
 
     useEffect(() => {
         // Check if PDF file exists
-        fetch('/cv.pdf', { method: 'HEAD' })
+        fetch('/resume.pdf', { method: 'HEAD' })
             .then(response => {
                 // Check if response is actually a PDF (not HTML fallback)
                 const contentType = response.headers.get('content-type');
@@ -167,17 +167,17 @@ function CVPage({ onBack }) {
             <button onClick={onBack} className={styles.backButtonRight}>
                 Back to Home →
             </button>
-            <h1 className={styles.pageTitle}>Curriculum Vitae</h1>
+            <h1 className={styles.pageTitle}>Resume</h1>
             <div className={styles.cvContent}>
                 {pdfExists !== true && (
                     <div className={styles.fallback}>
-                        <p>Loading CV...</p>
+                        <p>Loading Resume...</p>
                     </div>
                 )}
                 {pdfExists === true && (
                     <iframe
-                        src="/cv.pdf"
-                        title="CV PDF Document"
+                        src="/resume.pdf"
+                        title="Resume PDF Document"
                         className={styles.pdf}
                     />
                 )}
