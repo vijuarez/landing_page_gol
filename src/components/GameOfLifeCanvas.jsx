@@ -8,7 +8,7 @@ const CELL_SIZE = 8; // pixels
 const COLOR = { r: 235, g: 170, b: 30 }; // Warm amber/gold
 
 // Opacity settings
-const MIN_OPACITY = 0.1;     // Opacity at age 1 (20%)
+const MIN_OPACITY = 0.1;     // Opacity at age 1 (10%)
 const MAX_OPACITY = 1.0;     // Maximum opacity (100%)
 const SIGMOID_CENTER = MAX_AGE / 2;   // Age at which opacity is ~75%
 const SIGMOID_STEEPNESS = 0.1; // How quickly opacity changes (higher = steeper)
@@ -24,12 +24,13 @@ function ageToOpacity(age) {
     if (age === 1) return MIN_OPACITY;
 
     // Sigmoid function: y = min + (max - min) / (1 + e^(-k*(x - center)))
+    // Targeting pleasing look: very faint young cells, bright old cells, little in-between
     const sigmoid = 1 / (1 + Math.exp(-SIGMOID_STEEPNESS * (age - SIGMOID_CENTER)));
     return MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * sigmoid;
 }
 
 /**
- * Full-screen canvas rendering Game of Life cells via ImageData
+ * Full-screen canvas rendering of Game of Life cells
  * Cells fade in/out based on their age using sigmoid-based opacity
  */
 export function GameOfLifeCanvas({ cellAges, gridWidth }) {
@@ -70,47 +71,33 @@ export function GameOfLifeCanvas({ cellAges, gridWidth }) {
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, width, height);
 
-            // Build ImageData
-            const imageData = ctx.createImageData(width, height);
-            const data = imageData.data;
-
-            // Draw cells with age-based opacity (Manual Lerp)
+            const cellsByColor = new Map();
             for (const [cellKey, age] of currentCellAges) {
-                if (age <= 0) continue; // Skip dead cells
-
+                if (age <= 0) continue;
                 const [x, y] = decodeCell(cellKey, gridWidthRef.current);
                 const px = x * CELL_SIZE;
                 const py = y * CELL_SIZE;
-
-                // Skip if cell is outside visible area
                 if (px >= width || py >= height || px < 0 || py < 0) continue;
 
-                // Calculate opacity from age
                 const opacity = ageToOpacity(age);
-
-                // Manual Lerp: Color * Opacity (assuming black background)
                 const r = Math.floor(COLOR.r * opacity);
                 const g = Math.floor(COLOR.g * opacity);
                 const b = Math.floor(COLOR.b * opacity);
 
-                // Fill cellSize × cellSize block
-                for (let dy = 0; dy < CELL_SIZE; dy++) {
-                    for (let dx = 0; dx < CELL_SIZE; dx++) {
-                        const pixelX = px + dx;
-                        const pixelY = py + dy;
+                const colorKey = r | (g << 8) | (b << 16);
+                if (!cellsByColor.has(colorKey)) cellsByColor.set(colorKey, []);
+                cellsByColor.get(colorKey).push({ px, py });
+            }
 
-                        if (pixelX < width && pixelY < height) {
-                            const idx = (pixelY * width + pixelX) * 4;
-                            data[idx] = r;
-                            data[idx + 1] = g;
-                            data[idx + 2] = b;
-                            data[idx + 3] = 255; // Full Alpha
-                        }
-                    }
+            for (const [color, cells] of cellsByColor) {
+                // Testing showed better performance by batching style changes and only interpolating the string once
+                // I'd like to test this against more varied targets in the future, my numbers weren't conclusive
+                ctx.fillStyle = `rgb(${color & 255},${(color >>> 8) & 255},${(color >>> 16) & 255})`;
+                for (const { px, py } of cells) {
+                    ctx.fillRect(px, py, CELL_SIZE, CELL_SIZE);
                 }
             }
 
-            ctx.putImageData(imageData, 0, 0);
             animationFrameRef.current = requestAnimationFrame(render);
         };
 
