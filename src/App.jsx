@@ -17,7 +17,7 @@ function App() {
     const handleMouseMove = useCallback((e) => {
         const cellX = Math.floor(e.clientX / CELL_SIZE);
         const cellY = Math.floor(e.clientY / CELL_SIZE);
-        activate(cellX, cellY, 4);
+        activate(cellX, cellY);
     }, [activate]);
 
     useEffect(() => {
@@ -27,7 +27,7 @@ function App() {
                 const touch = e.touches[0];
                 const cellX = Math.floor(touch.clientX / CELL_SIZE);
                 const cellY = Math.floor(touch.clientY / CELL_SIZE);
-                activate(cellX, cellY, 4);
+                activate(cellX, cellY);
             }
         };
 

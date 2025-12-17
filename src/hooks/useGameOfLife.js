@@ -67,8 +67,9 @@ export function useGameOfLife() {
         }
     }, []);
 
-    // Activate cells around a point
-    const activate = useCallback((cellX, cellY, radius) => {
+    // Activate cells around a point.
+    // Default radius is given, but it might be fun to incorporate touch pressure later
+    const activate = useCallback((cellX, cellY, radius=4) => {
         if (workerRef.current) {
             workerRef.current.postMessage({
                 type: 'activate',
