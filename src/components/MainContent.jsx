@@ -1,5 +1,8 @@
+import { siteConfig } from '../config';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { PortfolioGallery } from './PortfolioGallery';
+import Markdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 
 /**
  * Main content component with full-page slide transitions.
@@ -10,7 +13,7 @@ export function MainContent({ triggerWave }) {
     const [currentPage, setCurrentPage] = useState('welcome');
     const idleTimerRef = useRef(null);
 
-    // Idle detection - trigger wave after 10 seconds of no activity
+    // Idle detection - trigger wave after configured time of no activity
     const resetIdleTimer = useCallback(() => {
         if (idleTimerRef.current) {
             clearTimeout(idleTimerRef.current);
@@ -21,10 +24,11 @@ export function MainContent({ triggerWave }) {
                 triggerWave();
                 idleTimerRef.current = setInterval(() => {
                     triggerWave();
-                }, 2000);
+                }, siteConfig.idleTimer.interval);
             }
-        }, 10000);
+        }, siteConfig.idleTimer.timeout);
     }, [triggerWave]);
+
 
     useEffect(() => {
         const handleActivity = () => resetIdleTimer();
@@ -89,8 +93,8 @@ function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
         <div style={welcomeContainerStyle}>
             {/* Header - Fixed at top */}
             <header style={headerStyle}>
-                <h1 style={titleStyle}>Vicente Juárez</h1>
-                <p style={subtitleStyle}>Full Stack Developer</p>
+                <h1 style={titleStyle}>{siteConfig.identity.name}</h1>
+                <p style={subtitleStyle}>{siteConfig.identity.title}</p>
             </header>
 
             {/* Main Navigation Buttons - Centered */}
@@ -111,11 +115,11 @@ function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
 
             {/* Footer Links */}
             <footer style={footerStyle}>
-                <a className="main-button" href="mailto:vijuarez97@gmail.com" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                <a className="main-button" href={siteConfig.links.email} target="_blank" rel="noopener noreferrer" style={linkStyle}>
                     Email
                 </a>
                 <span style={dividerStyle}>•</span>
-                <a className="main-button" href="https://github.com/vijuarez" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                <a className="main-button" href={siteConfig.links.github} target="_blank" rel="noopener noreferrer" style={linkStyle}>
                     GitHub
                 </a>
                 <span style={dividerStyle}>•</span>
@@ -129,20 +133,10 @@ function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
                 <div style={aboutModalOverlayStyle} onClick={() => setShowAboutModal(false)}>
                     <div style={aboutModalContentStyle} onClick={(e) => e.stopPropagation()}>
                         <button style={aboutCloseButtonStyle} onClick={() => setShowAboutModal(false)}>×</button>
-                        <h2 style={{ marginTop: 0, color: '#FFD700', fontFamily: 'Quicksand', fontWeight: '300' }}>About</h2>
-                        <p>
-                            Welcome to my interactive portfolio! This site is built with React and features a neat
-                            Game of Life simulation running on a background canvas. Move your mouse (or drag your finger) modify the simulation.
-                        </p>
-                        <br></br>
-                        <p>
-                            I made this as a recreation of <a href="https://github.com/vijuarez/vijuarez.github.io" target="_blank" rel="noopener noreferrer" style={linkStyle}>a previous homepage</a> I made with Flutter some years ago.
-                            It was a fun refresher for React and gave me the chance to play with some agentic workflows.
-                        </p>
-                        <br></br>
-                        <p>
-                            Feel free to explore my projects and CV!
-                        </p>
+                        <h2 style={{ marginTop: 0, color: '#FFD700', fontFamily: 'Quicksand', fontWeight: '300' }}>{siteConfig.about.title}</h2>
+                        <div className="markdown">
+                            <ReactMarkdown>{siteConfig.about.content}</ReactMarkdown>
+                        </div>
                     </div>
                 </div>
             )}

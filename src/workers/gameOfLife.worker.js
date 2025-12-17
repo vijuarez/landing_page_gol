@@ -8,10 +8,8 @@
 // ============================================
 // Aging Constants (easily tunable)
 // ============================================
-const AGE_GAIN_RATE = 15;    // Age increase per step when alive
-const AGE_DECAY_RATE = 8;   // Age decrease per step when dead
-const INITIAL_AGE = 1;      // Age for newly born cells
-export const MAX_AGE = 80;         // Maximum age for cells
+// Configured in src/config.js
+import { gameOfLifeConfig } from '../config';
 
 // Simulation state (The Truth)
 let aliveCells = new Set();
@@ -21,7 +19,7 @@ let cellAges = new Map();
 
 let gridWidth = 0;
 let gridHeight = 0;
-let maxAlive = 10000;
+let maxAlive = gameOfLifeConfig.simulation.maxAlive;
 let waveTime = 0;
 
 const encodeCell = (x, y) => x + y * gridWidth;
@@ -89,10 +87,10 @@ function gameOfLifeStep() {
 
         if (isNowAlive) {
             // Alive: Gain age, capped at MAX_AGE
-            newAge = Math.min(currentAge + AGE_GAIN_RATE, MAX_AGE);
+            newAge = Math.min(currentAge + gameOfLifeConfig.simulation.ageGainRate, gameOfLifeConfig.simulation.maxAge);
         } else {
             // Dead: Decay
-            newAge = currentAge - AGE_DECAY_RATE;
+            newAge = currentAge - gameOfLifeConfig.simulation.ageDecayRate;
         }
 
         // Keep if visible
@@ -110,7 +108,7 @@ function gameOfLifeStep() {
  * - Outer Radius (> 2): Creator (spawns new cells)
  */
 function activateRadius(centerX, centerY, radius) {
-    const innerRadius = 3; // Eraser size
+    const innerRadius = gameOfLifeConfig.interaction.radius; // Eraser size
 
     for (let dx = -radius; dx <= radius; dx++) {
         for (let dy = -radius; dy <= radius; dy++) {
@@ -133,11 +131,11 @@ function activateRadius(centerX, centerY, radius) {
                             if (aliveCells.size < maxAlive) {
                                 aliveCells.add(key);
                                 if (!cellAges.has(key)) {
-                                    cellAges.set(key, INITIAL_AGE);
+                                    cellAges.set(key, gameOfLifeConfig.simulation.initialAge);
                                 }
                             }
                         } else {
-                            cellAges.set(key, Math.min(cellAges.get(key) + Math.floor(AGE_GAIN_RATE / 3), MAX_AGE));
+                            cellAges.set(key, Math.min(cellAges.get(key) + Math.floor(gameOfLifeConfig.simulation.ageGainRate / 3), gameOfLifeConfig.simulation.maxAge));
                         }
                     }
                 }
@@ -165,7 +163,7 @@ function activateWave() {
                 if (aliveCells.size < maxAlive) {
                     aliveCells.add(key);
                     if (!cellAges.has(key)) {
-                        cellAges.set(key, INITIAL_AGE);
+                        cellAges.set(key, gameOfLifeConfig.simulation.initialAge);
                     }
                 }
             }
@@ -178,7 +176,7 @@ function activateWave() {
 /**
  * Spawn initial random cells to seed the simulation
  */
-function spawnInitialCells(count = 500) {
+function spawnInitialCells(count = gameOfLifeConfig.simulation.initialSpawnCount) {
     let added = 0;
     while (added < count && aliveCells.size < maxAlive) {
         const x = Math.floor(Math.random() * gridWidth);
@@ -186,7 +184,7 @@ function spawnInitialCells(count = 500) {
         const key = encodeCell(x, y);
         if (!aliveCells.has(key)) {
             aliveCells.add(key);
-            cellAges.set(key, INITIAL_AGE);
+            cellAges.set(key, gameOfLifeConfig.simulation.initialAge);
             added++;
         }
     }
@@ -203,7 +201,7 @@ function startLoop() {
         self.postMessage({
             cellAges: Array.from(cellAges.entries())
         });
-    }, 50);
+    }, gameOfLifeConfig.simulation.tickRate);
 }
 
 // Message handler
@@ -217,7 +215,7 @@ self.onmessage = (e) => {
         maxAlive = payload.maxAlive || 10000;
         aliveCells = new Set();
         cellAges = new Map();
-        spawnInitialCells(500);
+        spawnInitialCells(gameOfLifeConfig.simulation.initialSpawnCount);
         startLoop();
     } else if (type === 'activate') {
         activateRadius(payload.centerX, payload.centerY, payload.radius);

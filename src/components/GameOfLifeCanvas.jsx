@@ -1,17 +1,11 @@
 import { useRef, useEffect } from 'react';
-import { decodeCell, MAX_AGE } from '../workers/gameOfLife.worker';
+import { decodeCell } from '../workers/gameOfLife.worker';
+import { canvasConfig } from '../config';
 
 // ============================================
 // Rendering Constants (easily tunable)
 // ============================================
-const CELL_SIZE = 8; // pixels
-const COLOR = { r: 235, g: 170, b: 30 }; // Warm amber/gold
-
-// Opacity settings
-const MIN_OPACITY = 0.1;     // Opacity at age 1 (10%)
-const MAX_OPACITY = 1.0;     // Maximum opacity (100%)
-const SIGMOID_CENTER = MAX_AGE / 2;   // Age at which opacity is ~75%
-const SIGMOID_STEEPNESS = 0.1; // How quickly opacity changes (higher = steeper)
+// Configured in src/config.js
 
 /**
  * Calculate opacity from cell age using sigmoid function
@@ -21,12 +15,12 @@ const SIGMOID_STEEPNESS = 0.1; // How quickly opacity changes (higher = steeper)
  */
 function ageToOpacity(age) {
     if (age <= 0) return 0;
-    if (age === 1) return MIN_OPACITY;
+    if (age === 1) return canvasConfig.opacity.min;
 
     // Sigmoid function: y = min + (max - min) / (1 + e^(-k*(x - center)))
     // Targeting pleasing look: very faint young cells, bright old cells, little in-between
-    const sigmoid = 1 / (1 + Math.exp(-SIGMOID_STEEPNESS * (age - SIGMOID_CENTER)));
-    return MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * sigmoid;
+    const sigmoid = 1 / (1 + Math.exp(-canvasConfig.opacity.sigmoidSteepness * (age - canvasConfig.opacity.sigmoidCenter)));
+    return canvasConfig.opacity.min + (canvasConfig.opacity.max - canvasConfig.opacity.min) * sigmoid;
 }
 
 /**
@@ -75,14 +69,14 @@ export function GameOfLifeCanvas({ cellAges, gridWidth }) {
             for (const [cellKey, age] of currentCellAges) {
                 if (age <= 0) continue;
                 const [x, y] = decodeCell(cellKey, gridWidthRef.current);
-                const px = x * CELL_SIZE;
-                const py = y * CELL_SIZE;
+                const px = x * canvasConfig.cellSize;
+                const py = y * canvasConfig.cellSize;
                 if (px >= width || py >= height || px < 0 || py < 0) continue;
 
                 const opacity = ageToOpacity(age);
-                const r = Math.floor(COLOR.r * opacity);
-                const g = Math.floor(COLOR.g * opacity);
-                const b = Math.floor(COLOR.b * opacity);
+                const r = Math.floor(canvasConfig.color.r * opacity);
+                const g = Math.floor(canvasConfig.color.g * opacity);
+                const b = Math.floor(canvasConfig.color.b * opacity);
 
                 const colorKey = r | (g << 8) | (b << 16);
                 if (!cellsByColor.has(colorKey)) cellsByColor.set(colorKey, []);
@@ -94,7 +88,7 @@ export function GameOfLifeCanvas({ cellAges, gridWidth }) {
                 // I'd like to test this against more varied targets in the future, my numbers weren't conclusive
                 ctx.fillStyle = `rgb(${color & 255},${(color >>> 8) & 255},${(color >>> 16) & 255})`;
                 for (const { px, py } of cells) {
-                    ctx.fillRect(px, py, CELL_SIZE, CELL_SIZE);
+                    ctx.fillRect(px, py, canvasConfig.cellSize, canvasConfig.cellSize);
                 }
             }
 
