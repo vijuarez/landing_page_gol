@@ -1,11 +1,7 @@
-import { useRef, useEffect } from 'react';
 import { decodeCell } from '../workers/gameOfLife.worker';
 import { canvasConfig } from '../config';
-
-// ============================================
-// Rendering Constants (easily tunable)
-// ============================================
-// Configured in src/config.js
+import styles from './GameOfLifeCanvas.module.css';
+import { useEffect, useRef } from "react";
 
 /**
  * Calculate opacity from cell age using sigmoid function
@@ -61,11 +57,24 @@ export function GameOfLifeCanvas({ cellAges, gridWidth }) {
             const width = canvas.width;
             const height = canvas.height;
 
-            // Clear with black
-            ctx.fillStyle = '#000000';
+            // Clear with background color
+            ctx.fillStyle = canvasConfig.backgroundColor;
             ctx.fillRect(0, 0, width, height);
 
             const cellsByColor = new Map();
+
+            // Parse background once (expects "#RRGGBB")
+            const bgHex = canvasConfig.backgroundColor.replace("#", "");
+            const bgR = parseInt(bgHex.slice(0, 2), 16) || 0;
+            const bgG = parseInt(bgHex.slice(2, 4), 16) || 0;
+            const bgB = parseInt(bgHex.slice(4, 6), 16) || 0;
+
+            // Parse foreground once (expects "#RRGGBB")
+            const fgHex = canvasConfig.color.replace("#", "");
+            const fgR = parseInt(fgHex.slice(0, 2), 16) || 0;
+            const fgG = parseInt(fgHex.slice(2, 4), 16) || 0;
+            const fgB = parseInt(fgHex.slice(4, 6), 16) || 0;
+
             for (const [cellKey, age] of currentCellAges) {
                 if (age <= 0) continue;
                 const [x, y] = decodeCell(cellKey, gridWidthRef.current);
@@ -74,9 +83,11 @@ export function GameOfLifeCanvas({ cellAges, gridWidth }) {
                 if (px >= width || py >= height || px < 0 || py < 0) continue;
 
                 const opacity = ageToOpacity(age);
-                const r = Math.floor(canvasConfig.color.r * opacity);
-                const g = Math.floor(canvasConfig.color.g * opacity);
-                const b = Math.floor(canvasConfig.color.b * opacity);
+
+                // Lerp from background -> real color by opacity
+                const r = Math.floor(bgR + (fgR - bgR) * opacity);
+                const g = Math.floor(bgG + (fgG - bgG) * opacity);
+                const b = Math.floor(bgB + (fgB - bgB) * opacity);
 
                 const colorKey = r | (g << 8) | (b << 16);
                 if (!cellsByColor.has(colorKey)) cellsByColor.set(colorKey, []);
@@ -108,15 +119,7 @@ export function GameOfLifeCanvas({ cellAges, gridWidth }) {
     return (
         <canvas
             ref={canvasRef}
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                zIndex: -1,
-                filter: 'blur(2px)',
-            }}
+            className={styles.canvas}
             aria-hidden="true"
         />
     );

@@ -1,8 +1,8 @@
 import { siteConfig } from '../config';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { PortfolioGallery } from './PortfolioGallery';
-import Markdown from "react-markdown";
 import ReactMarkdown from "react-markdown";
+import styles from './MainContent.module.css';
 
 /**
  * Main content component with full-page slide transitions.
@@ -60,15 +60,15 @@ export function MainContent({ triggerWave }) {
     const goBack = () => setCurrentPage('welcome');
 
     return (
-        <div style={viewportStyle}>
+        <div className={styles.viewport}>
             <div style={sliderStyle(getOffset())}>
                 {/* CV Page (Left of Welcome) */}
-                <div style={pageStyle}>
+                <div className={styles.page}>
                     <CVPage onBack={goBack} />
                 </div>
 
                 {/* Welcome Page (Center) */}
-                <div style={pageStyle}>
+                <div className={styles.page}>
                     <WelcomePage
                         onNavigateCV={() => setCurrentPage('cv')}
                         onNavigatePortfolio={() => setCurrentPage('portfolio')}
@@ -76,7 +76,7 @@ export function MainContent({ triggerWave }) {
                 </div>
 
                 {/* Portfolio Page (Right of Welcome) */}
-                <div style={pageStyle}>
+                <div className={styles.page}>
                     <PortfolioPage onBack={goBack} />
                 </div>
             </div>
@@ -90,51 +90,51 @@ export function MainContent({ triggerWave }) {
 function WelcomePage({ onNavigateCV, onNavigatePortfolio }) {
     const [showAboutModal, setShowAboutModal] = useState(false);
     return (
-        <div style={welcomeContainerStyle}>
+        <div className={styles.welcomeContainer}>
             {/* Header - Fixed at top */}
-            <header style={headerStyle}>
-                <h1 style={titleStyle}>{siteConfig.identity.name}</h1>
-                <p style={subtitleStyle}>{siteConfig.identity.title}</p>
+            <header className={styles.header}>
+                <h1 className={styles.title}>{siteConfig.identity.name}</h1>
+                <p className={styles.subtitle}>{siteConfig.identity.title}</p>
             </header>
 
             {/* Main Navigation Buttons - Centered */}
-            <nav style={navStyle}>
-                <button onClick={onNavigateCV} style={primaryButtonStyle}>
-                    <svg style={arrowIconStyle} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <nav className={styles.nav}>
+                <button onClick={onNavigateCV} className={styles.primaryButton}>
+                    <svg className={styles.arrowIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                     Curriculum Vitae
                 </button>
-                <button onClick={onNavigatePortfolio} style={primaryButtonStyle}>
+                <button onClick={onNavigatePortfolio} className={styles.primaryButton}>
                     Portfolio
-                    <svg style={arrowIconStyle} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className={styles.arrowIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
             </nav>
 
             {/* Footer Links */}
-            <footer style={footerStyle}>
-                <a className="main-button" href={siteConfig.links.email} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+            <footer className={styles.footer}>
+                <a href={siteConfig.links.email} target="_blank" rel="noopener noreferrer">
                     Email
                 </a>
-                <span style={dividerStyle}>•</span>
-                <a className="main-button" href={siteConfig.links.github} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                <span className={styles.divider}>•</span>
+                <a href={siteConfig.links.github} target="_blank" rel="noopener noreferrer">
                     GitHub
                 </a>
-                <span style={dividerStyle}>•</span>
-                <a className="main-button" href="#" onClick={(e) => { e.preventDefault(); setShowAboutModal(true); }} style={linkStyle}>
+                <span className={styles.divider}>•</span>
+                <a href="#" onClick={(e) => { e.preventDefault(); setShowAboutModal(true); }}>
                     About
                 </a>
             </footer>
 
             {/* About Modal */}
             {showAboutModal && (
-                <div style={aboutModalOverlayStyle} onClick={() => setShowAboutModal(false)}>
-                    <div style={aboutModalContentStyle} onClick={(e) => e.stopPropagation()}>
-                        <button style={aboutCloseButtonStyle} onClick={() => setShowAboutModal(false)}>×</button>
-                        <h2 style={{ marginTop: 0, color: '#FFD700', fontFamily: 'Quicksand', fontWeight: '300' }}>{siteConfig.about.title}</h2>
-                        <div className="markdown">
+                <div className={styles.aboutModalOverlay} onClick={() => setShowAboutModal(false)}>
+                    <div className={styles.aboutModalContent} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.aboutCloseButton} onClick={() => setShowAboutModal(false)}>×</button>
+                        <h2 className={styles.aboutTitle}>{siteConfig.about.title}</h2>
+                        <div className={styles.markdown}>
                             <ReactMarkdown>{siteConfig.about.content}</ReactMarkdown>
                         </div>
                     </div>
@@ -163,14 +163,14 @@ function CVPage({ onBack }) {
     }, []);
 
     return (
-        <div style={subpageContainerStyle}>
-            <button onClick={onBack} style={backButtonRightStyle}>
+        <div className={styles.subpageContainer}>
+            <button onClick={onBack} className={styles.backButtonRight}>
                 Back to Home →
             </button>
-            <h1 style={pageTitleStyle}>Curriculum Vitae</h1>
-            <div style={cvContentStyle}>
+            <h1 className={styles.pageTitle}>Curriculum Vitae</h1>
+            <div className={styles.cvContent}>
                 {pdfExists !== true && (
-                    <div style={fallbackStyle}>
+                    <div className={styles.fallback}>
                         <p>Loading CV...</p>
                     </div>
                 )}
@@ -178,7 +178,7 @@ function CVPage({ onBack }) {
                     <iframe
                         src="/cv.pdf"
                         title="CV PDF Document"
-                        style={pdfStyle}
+                        className={styles.pdf}
                     />
                 )}
             </div>
@@ -189,14 +189,17 @@ function CVPage({ onBack }) {
 /**
  * Portfolio Page with gallery and back button
  */
+/**
+ * Portfolio Page with gallery and back button
+ */
 function PortfolioPage({ onBack }) {
     return (
-        <div style={subpageContainerStyle}>
-            <button onClick={onBack} style={backButtonStyle}>
+        <div className={styles.subpageContainer}>
+            <button onClick={onBack} className={styles.backButton}>
                 ← Back to Home
             </button>
-            <h1 style={pageTitleStyle}>Portfolio</h1>
-            <div style={portfolioContentStyle}>
+            <h1 className={styles.pageTitle}>Portfolio</h1>
+            <div className={styles.portfolioContent}>
                 <PortfolioGallery />
             </div>
         </div>
@@ -207,23 +210,9 @@ function PortfolioPage({ onBack }) {
 // Layout Styles
 // ============================================
 
-const viewportStyle = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100vw',
-    height: '100vh',
-    overflow: 'hidden',
-    zIndex: 1,
-    pointerEvents: 'none', // Allow mouse events to pass through to canvas
-};
-
-// SVG arrow icon style for navigation buttons
-const arrowIconStyle = {
-    width: '20px',
-    height: '20px',
-    flexShrink: 0,
-};
+// ============================================
+// Layout Styles
+// ============================================
 
 const sliderStyle = (offset) => ({
     display: 'flex',
@@ -233,233 +222,3 @@ const sliderStyle = (offset) => ({
     transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
 });
 
-const pageStyle = {
-    width: '100vw',
-    height: '100%',
-    flexShrink: 0,
-};
-
-// ============================================
-// Welcome Page Styles
-// ============================================
-
-const welcomeContainerStyle = {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '60px 20px 40px',
-    color: '#ffffff',
-};
-
-const headerStyle = {
-    textAlign: 'center',
-    fontFamily: 'Quicksand',
-    textShadow: 'rgb(233 175 175) 0px 0px 1.5em',
-};
-
-const titleStyle = {
-    fontSize: 'clamp(2.5em, 6vw, 4em)',
-    margin: '0 0 16px 0',
-    background: 'linear-gradient(135deg, #ffffff 0%, #FFD700 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    fontWeight: '300',
-};
-
-const subtitleStyle = {
-    fontSize: 'clamp(1em, 2.5vw, 1.4em)',
-    margin: 0,
-    color: 'rgba(255, 255, 255, 0.7)',
-    letterSpacing: '3px',
-    textTransform: 'uppercase',
-    fontWeight: '400',
-};
-
-const navStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    flex: 1,
-    justifyContent: 'center',
-    maxWidth: '300px',
-    width: '100%',
-};
-
-const primaryButtonStyle = {
-    padding: '20px 50px',
-    fontSize: '1.1em',
-    fontWeight: '500',
-    backgroundColor: 'rgba(255, 200, 50, 0.1)',
-    border: '2px solid #FFD700',
-    color: '#FFD700',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    letterSpacing: '1px',
-    backdropFilter: 'blur(10px)',
-    pointerEvents: 'auto', // Re-enable pointer events for buttons
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px', // Space between icon and text
-};
-
-const footerStyle = {
-    display: 'flex',
-    gap: '20px',
-    alignItems: 'center',
-};
-
-const linkStyle = {
-    color: '#FFD700',
-    textDecoration: 'none',
-    width: '8em',
-    textAlign: 'center',
-    transition: 'color 0.2s ease',
-    pointerEvents: 'auto', // Re-enable pointer events for links
-};
-
-const dividerStyle = {
-    color: 'rgba(255, 200, 50, 0.4)',
-};
-
-// ============================================
-// Subpage Styles (CV & Portfolio)
-// ============================================
-
-const subpageContainerStyle = {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '30px 40px',
-    color: '#ffffff',
-};
-
-const backButtonStyle = {
-    padding: '12px 24px',
-    backgroundColor: 'transparent',
-    color: '#FFD700',
-    border: '1px solid rgba(255, 200, 50, 0.5)',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '1em',
-    fontWeight: '500',
-    alignSelf: 'flex-start',
-    marginBottom: '20px',
-    transition: 'all 0.2s ease',
-    pointerEvents: 'auto', // Re-enable pointer events for back button
-};
-
-// Back button aligned to the right for CV page (comes from left)
-const backButtonRightStyle = {
-    ...backButtonStyle,
-    alignSelf: 'flex-end',
-};
-
-const pageTitleStyle = {
-    fontSize: 'clamp(1.8em, 4vw, 2.5em)',
-    fontWeight: '600',
-    marginBottom: '25px',
-    textAlign: 'center',
-    background: 'linear-gradient(135deg, #ffffff 0%, #FFD700 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-};
-
-const cvContentStyle = {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRadius: '12px',
-    border: '1px solid rgba(255, 200, 50, 0.2)',
-    overflow: 'hidden',
-    minHeight: 0,
-    pointerEvents: 'auto', // Re-enable pointer events for content
-};
-
-const pdfStyle = {
-    width: '100%',
-    height: '100%',
-    border: 'none',
-};
-
-const fallbackStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    gap: '20px',
-    color: 'rgba(255, 255, 255, 0.7)',
-};
-
-const downloadLinkStyle = {
-    padding: '14px 30px',
-    backgroundColor: '#FFD700',
-    color: '#000000',
-    textDecoration: 'none',
-    borderRadius: '6px',
-    fontWeight: '600',
-    pointerEvents: 'auto',
-};
-
-const portfolioContentStyle = {
-    flex: 1,
-    overflow: 'auto',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: '12px',
-    minHeight: 0,
-    pointerEvents: 'auto',
-};
-
-// ============================================
-// About Modal Styles
-// ============================================
-
-const aboutModalOverlayStyle = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    backdropFilter: 'blur(5px)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2000,
-    pointerEvents: 'auto',
-};
-
-const aboutModalContentStyle = {
-    backgroundColor: 'rgba(20, 20, 20, 0.75)',
-    border: '1px solid rgba(255, 200, 50, 0.3)',
-    borderRadius: '12px',
-    padding: '40px',
-    maxWidth: '500px',
-    width: '90%',
-    position: 'relative',
-    color: '#e0e0e0',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-    fontFamily: 'Inter, sans-serif',
-    lineHeight: '1.6',
-};
-
-const aboutCloseButtonStyle = {
-    position: 'absolute',
-    top: '15px',
-    right: '20px',
-    background: 'none',
-    border: 'none',
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontSize: '28px',
-    cursor: 'pointer',
-    padding: '0',
-    lineHeight: 1,
-    transition: 'color 0.2s',
-};
