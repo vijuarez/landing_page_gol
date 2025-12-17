@@ -4,6 +4,14 @@
  * This file contains all the configurable data and settings for the application.
  */
 
+
+/**
+ * Portfolio data structure, add your own projects!
+ *
+ * Image recommendations:
+ * - thumbnail: 600×400px (3:2 aspect ratio) - shown in gallery
+ * - screenshot: 1200×800px (3:2 aspect ratio) - shown in modal
+ */
 export const portfolioConfig = {
     projects: [
         {
@@ -82,46 +90,83 @@ The platform meaningfully improved how residents discover and access housing ben
     ]
 };
 
+/**
+ * Game of Life simulation configuration
+ *
+ * Caution! `simulation.tickRate` and `simulation.maxAlive` impact performance.
+ */
 export const gameOfLifeConfig = {
+    // Configuration on how the Game of Life simulation works
     simulation: {
-        ageGainRate: 15,    // Age increase per step when alive
-        ageDecayRate: 8,    // Age decrease per step when dead
-        initialAge: 1,      // Age for newly born cells
-        maxAge: 80,         // Maximum age for cells
-        maxAlive: 25000,    // Hard cap on alive cells to prevent performance issues
-        tickRate: 50,       // Interval in ms (50ms = 20 FPS)
+        // Age increase per step when alive
+        ageGainRate: 15,
+        // Age decrease per step when dead
+        ageDecayRate: 8,
+        // Age for newly born cells
+        initialAge: 1,
+        // Maximum age for cells
+        maxAge: 80,
+        // Hard cap on alive cells to prevent performance issues
+        maxAlive: 25000,
+        // Interval in ms (50ms = 20 FPS)
+        tickRate: 50,
+        // Number of random cells at the start of the simulation
         initialSpawnCount: 500
     },
+    // Configuration on how the interaction with the Game of Life simulation works
     interaction: {
-        radius: 3,          // Eraser radius
-        waveInterval: 2000  // Auto-wave interval in ms
+        // Eraser radius
+        radius: 3,
+        // Time of inactivity before spawn wave
+        waveTimeout: 10000,
+        // Time between waves when inactive timeout hits
+        waveInterval: 2000
     }
 };
 
+/**
+ * Game of Life canvas configuration
+ *
+ * While `gameOfLifeConfig` has the key performance configurations, `cellSize` and `scaleFactor`
+ * have a massive impact in performance, since simulation size is canvas dependent.
+ */
 export const canvasConfig = {
-    cellSize: 8, // pixels
-    color: { r: 235, g: 170, b: 30 }, // Warm amber/gold
+    // Pixel size for Game of Life canvas
+    cellSize: 8,
+    // Factor for the extra space of the simulation outside canvas
+    scaleFactor: 1.2,
+    // Alive cells color
+    color: '#ebaa1e',
+    // Background color
+    backgroundColor: '#000000',
+    // Configuration for the opacity/age looks
     opacity: {
-        min: 0.1,     // Opacity at age 1 (10%)
-        max: 1.0,     // Maximum opacity (100%)
-        sigmoidSteepness: 0.1, // How quickly opacity changes
-        sigmoidCenter: 40 // Center of sigmoid curve (usually maxAge / 2)
+        // Opacity at age 1 (10%)
+        min: 0.1,
+        // Maximum opacity (100%)
+        max: 1.0,
+        // How quickly opacity changes
+        sigmoidSteepness: 0.1,
+        // Center of sigmoid curve (usually maxAge / 2)
+        sigmoidCenter: 40
     }
 };
 
+/**
+ * Static strings for the site.
+ */
 export const siteConfig = {
+    // Main title
     identity: {
         name: "Vicente Juárez",
         title: "Full Stack Developer"
     },
+    // Bottom links configuration
     links: {
         email: "mailto:vijuarez97@gmail.com",
         github: "https://github.com/vijuarez",
     },
-    idleTimer: {
-        timeout: 10000, // 10 seconds wait before auto-waves
-        interval: 2000  // 2 seconds between auto-waves
-    },
+    // "About" modal configuration
     about: {
         title: "About",
         content: `

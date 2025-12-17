@@ -4,11 +4,6 @@
  * Runs Game of Life updates asynchronously (~20 FPS), independent of render thread.
  * Tracks cell "age" for fade-in/fade-out visual effects.
  */
-
-// ============================================
-// Aging Constants (easily tunable)
-// ============================================
-// Configured in src/config.js
 import { gameOfLifeConfig } from '../config';
 
 // Simulation state (The Truth)
@@ -209,10 +204,9 @@ self.onmessage = (e) => {
     const { type, ...payload } = e.data;
 
     if (type === 'init') {
-        console.log(payload)
         gridWidth = payload.width;
         gridHeight = payload.height;
-        maxAlive = payload.maxAlive || 10000;
+        maxAlive = payload.maxAlive;
         aliveCells = new Set();
         cellAges = new Map();
         spawnInitialCells(gameOfLifeConfig.simulation.initialSpawnCount);

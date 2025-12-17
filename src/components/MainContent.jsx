@@ -1,4 +1,4 @@
-import { siteConfig } from '../config';
+import { siteConfig, gameOfLifeConfig } from '../config';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { PortfolioGallery } from './PortfolioGallery';
 import ReactMarkdown from "react-markdown";
@@ -24,9 +24,9 @@ export function MainContent({ triggerWave }) {
                 triggerWave();
                 idleTimerRef.current = setInterval(() => {
                     triggerWave();
-                }, siteConfig.idleTimer.interval);
+                }, gameOfLifeConfig.interaction.waveInterval);
             }
-        }, siteConfig.idleTimer.timeout);
+        }, gameOfLifeConfig.interaction.waveTimeout);
     }, [triggerWave]);
 
 
@@ -206,14 +206,7 @@ function PortfolioPage({ onBack }) {
     );
 }
 
-// ============================================
-// Layout Styles
-// ============================================
-
-// ============================================
-// Layout Styles
-// ============================================
-
+// Layout Style
 const sliderStyle = (offset) => ({
     display: 'flex',
     width: '300vw',

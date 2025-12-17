@@ -2,8 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { GameOfLifeCanvas } from './components/GameOfLifeCanvas';
 import { MainContent } from './components/MainContent';
 import { useGameOfLife } from './hooks/useGameOfLife';
-
-const CELL_SIZE = 8;
+import { canvasConfig} from "./config.js";
 
 /**
  * Root application component
@@ -15,8 +14,8 @@ function App() {
 
     // Global mouse tracking - captures movement anywhere on the page
     const handleMouseMove = useCallback((e) => {
-        const cellX = Math.floor(e.clientX / CELL_SIZE);
-        const cellY = Math.floor(e.clientY / CELL_SIZE);
+        const cellX = Math.floor(e.clientX / canvasConfig.cellSize);
+        const cellY = Math.floor(e.clientY / canvasConfig.cellSize);
         activate(cellX, cellY);
     }, [activate]);
 
@@ -25,8 +24,8 @@ function App() {
         const handleTouchMove = (e) => {
             if (e.touches.length > 0) {
                 const touch = e.touches[0];
-                const cellX = Math.floor(touch.clientX / CELL_SIZE);
-                const cellY = Math.floor(touch.clientY / CELL_SIZE);
+                const cellX = Math.floor(touch.clientX / canvasConfig.cellSize);
+                const cellY = Math.floor(touch.clientY / canvasConfig.cellSize);
                 activate(cellX, cellY);
             }
         };

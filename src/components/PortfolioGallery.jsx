@@ -7,9 +7,6 @@ import { portfolioConfig } from '../config';
 
 import styles from './PortfolioGallery.module.css';
 
-// ... (portfolioConfig import remains)
-
-
 /**
  * Portfolio gallery with modal detail view
  */

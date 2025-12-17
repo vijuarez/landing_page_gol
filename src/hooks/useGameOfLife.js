@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { canvasConfig } from '../config';
 
 /**
  * Custom hook to manage Game of Life state and worker communication
@@ -31,25 +32,23 @@ export function useGameOfLife() {
                 console.error('Game of Life Worker error:', error);
             };
 
-            const cellSize = 8;
-            const scaleFactor = 1.5;
-            const initialWidth = Math.floor((window.innerWidth * scaleFactor) / cellSize);
+            const initialWidth = Math.floor((window.innerWidth * canvasConfig.scaleFactor) / canvasConfig.cellSize);
             setGridWidth(initialWidth);
             workerRef.current.postMessage({
                 type: 'init',
                 width: initialWidth,
-                height: Math.floor((window.innerHeight * scaleFactor) / cellSize),
+                height: Math.floor((window.innerHeight * canvasConfig.scaleFactor) / canvasConfig.cellSize),
                 maxAlive: 25000,
             });
 
             const handleResize = () => {
                 if (workerRef.current) {
-                    const newWidth = Math.floor((window.innerWidth * scaleFactor) / cellSize);
+                    const newWidth = Math.floor((window.innerWidth * canvasConfig.scaleFactor) / canvasConfig.cellSize);
                     setGridWidth(newWidth);
                     workerRef.current.postMessage({
                         type: 'resize',
                         width: newWidth,
-                        height: Math.floor((window.innerHeight * scaleFactor) / cellSize),
+                        height: Math.floor((window.innerHeight * canvasConfig.scaleFactor) / canvasConfig.cellSize),
                     });
                 }
             };
