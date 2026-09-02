@@ -1,6 +1,6 @@
 /**
  * Application Configuration
- * 
+ *
  * This file contains all the configurable data and settings for the application.
  */
 
@@ -16,27 +16,27 @@ export const portfolioConfig = {
     projects: [
         {
             id: 'ai-domain-assistant',
-            title: 'AI-Powered Domain Assistant',
+            title: 'AI-Powered Government Assistant',
             shortDescription: 'A Gemini-powered guidance system for complex procedural queries, featuring a hybrid RAG system tuned for accuracy and source attribution.',
             extendedDescription: `
 ## Overview
 
 Full-stack development of an application that provides data visualization and an accurate AI assistant with built-in source attribution and complex domain-specific factoid retrieval.
 
-**Tech Stack:** Flutter, Flask and Google Cloud Platform.
+**Tech Stack:** Flutter, Flask, Google Cloud Platform.
 
 ## The Challenge
 
 Integrating a large language model with specialized domain knowledge while minimizing hallucinations and maintaining user trust. The solution required three layers:
 
 1. A **hybrid vector + keyword RAG system** to balance semantic understanding with precise phrase matching
-2. **Rigorous evaluation and tuning** to meet accuracy thresholds before production
-3. **Enforced source attribution** so users always knew where information originated
+2. **Evaluation and tuning** to meet accuracy thresholds before production
+3. **Source attribution** so users always knew where information originated
 
 ## Technical Implementation
 
 - **Frontend:** Flutter application designed from the ground up following the Material 3 design system
-- **Backend:** Flask microservice handling AI requests, integrating via JWT and shared secrets with the existing platform API
+- **Backend:** Flask microservice handling AI requests, integrating via JWT with the existing platform API
 - **RAG System:** Custom search weight tuning (keyword vs. vector similarity) against a curated evaluation dataset, validated by domain experts before launch
 
 ## Scale & Impact
@@ -49,8 +49,8 @@ Integrating a large language model with specialized domain knowledge while minim
         },
         {
             id: 'housing-subsidies-platform',
-            title: 'Housing Subsidies Platform',
-            shortDescription: 'A high-traffic web platform serving 20,000+ seasonal users, combining Ruby on Rails backend, Angular frontend, and complex domain logic for government housing benefit communication.',
+            title: 'Social Rent Platform',
+            shortDescription: 'A web platform serving 20,000+ seasonal users, combining Ruby on Rails backend, Angular frontend, and complex domain logic for government housing benefit communication.',
             extendedDescription: `
 ## Overview
 
@@ -69,20 +69,19 @@ Building a secure, feature-rich system that could reliably handle high traffic w
 - **Role-based access controls (RBAC)** ensuring users only access authorized information
 
 ### Core Features
-- **Complex internal interface** for content creation and process administration
+- **Tailor-made interfaces** for content creation and process administration
 - **Node-based visual editor** for designing complex email campaign workflows
 - **WYSIWYG editor** for managing multiple custom content types
 - **Advanced analytics** via Rudderstack for behavioral insights
 
 ## Scale & Impact
 
-- **High-traffic design** built to reliably handle 20,000+ monthly users and traffic spikes
 - **Cloud migration leadership:** Transitioned infrastructure from VPS to **Google Cloud Platform**
   - Deployed on **Cloud Run** with autoscaling
   - **Cloud SQL** for database management
   - **Cloud Storage** for user-facing assets
   - Cost optimization: maintained budget targets while handling peak concurrent load
-- **Data pipeline:** Migrated analytics from Airflow/dbt to **BigQuery**, enabling the research team to derive insights without impacting web service performance
+- **Data pipeline:** Migrated analytics from Airflow/dbt to **BigQuery**, enabling the research team to derive insights without sacrificing web service performance
 - **Impact:** The platform meaningfully improved how residents discover and access housing benefits, removing technical and informational barriers to accessing government support. The flexible content system allowed researchers to quickly iterate on content ideas and campaign behavior, cutting down latency between theory and practice.
             `,
             thumbnail: '/images/housing-platform-thumb.jpg',
